@@ -1,0 +1,32 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+MASTER	proxy_server.c	/^typedef struct MASTER{$/;"	s	file:
+Thread_main	proxy_server.c	/^void *Thread_main(void *arg){$/;"	f
+c_addr	proxy_server.c	/^    struct sockaddr_in c_addr;$/;"	m	struct:client	typeref:struct:client::sockaddr_in	file:
+c_addr	proxy_server.c	/^    struct sockaddr_in s_addr, c_addr;$/;"	m	struct:server	typeref:struct:server::	file:
+client	proxy_server.c	/^typedef struct client{$/;"	s	file:
+client	proxy_server.c	/^}client;$/;"	t	typeref:struct:client	file:
+client_buf	proxy_server.c	/^    char* client_buf;$/;"	m	struct:client	file:
+client_fd	proxy_server.c	/^	int client_fd;$/;"	m	struct:server	file:
+createClient	proxy_server.c	/^void *createClient(client *c){$/;"	f
+createSock	proxy_server.c	/^int createSock(struct server *s, char *port){$/;"	f
+fd	proxy_server.c	/^    int fd;$/;"	m	struct:MASTER	file:
+fd	proxy_server.c	/^    int fd;$/;"	m	struct:client	file:
+fd	proxy_server.c	/^    int fd;$/;"	m	struct:server	file:
+m	proxy_server.c	/^    master *m;$/;"	m	struct:client	file:
+m_addr	proxy_server.c	/^    struct sockaddr_in m_addr;$/;"	m	struct:MASTER	typeref:struct:MASTER::sockaddr_in	file:
+main	proxy_server.c	/^int main(int argc, char *argv[]){$/;"	f
+master	proxy_server.c	/^}master;$/;"	t	typeref:struct:MASTER	file:
+masterFailover	proxy_server.c	/^void masterFailover(client *c){$/;"	f
+req_msg	proxy_server.c	/^    char* req_msg;$/;"	m	struct:MASTER	file:
+s	proxy_server.c	/^server s;$/;"	v
+s_addr	proxy_server.c	/^    struct sockaddr_in s_addr, c_addr;$/;"	m	struct:server	typeref:struct:server::sockaddr_in	file:
+server	proxy_server.c	/^typedef struct server{$/;"	s	file:
+server	proxy_server.c	/^}server;$/;"	t	typeref:struct:server	file:
+sin_size	proxy_server.c	/^    unsigned int sin_size;$/;"	m	struct:server	file:
+size	proxy_server.c	/^    int size;$/;"	m	struct:MASTER	file:
+size	proxy_server.c	/^    int size;$/;"	m	struct:client	file:
