@@ -35,6 +35,8 @@ typedef struct server{
 
 server s;
 
+void masterFailover(client *c);
+
 int createSock(struct server *s, char *port){
 
     int size;
@@ -79,18 +81,29 @@ void *createClient(client *c){
     printf("Master Connected\n");
 }
 
-void masterFailover(client *c){
-    /*
-    char port[10];
 
-    if(c->m->m_addr.sin_port==htons(atoi("3000"))){
-        strcpy(port, "3001\n");
+void revalMaster(client *c){
+    char *port = "3000";
+
+    int size;
+    int opt=1;
+    c->m->fd=socket(AF_INET, SOCK_STREAM, 0);
+    setsockopt(c->m->fd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, 4);
+    c->m->m_addr.sin_family = AF_INET;
+    c->m->m_addr.sin_port = htons(atoi(port));
+    c->m->m_addr.sin_addr.s_addr==inet_addr("127.0.0.1");
+    memset(&(c->m->m_addr.sin_zero), 0, 8);
+
+    if(connect(c->m->fd, (struct sockaddr *)&(c->m->m_addr), sizeof(struct sockaddr_in)) < 0){
+        perror("connect");
+      //  masterFailover(c);
     }
-    else
-        strcpy(port, "3000\n");
 
-    */
+    printf("DRAM Master Connected\n");
+}
 
+
+void masterFailover(client *c){
     char *port = "3001";
 
     int size;
@@ -104,9 +117,10 @@ void masterFailover(client *c){
 
     if(connect(c->m->fd, (struct sockaddr *)&(c->m->m_addr), sizeof(struct sockaddr_in)) < 0){
         perror("connect");
+        revalMaster(c);
     }
 
-    printf("New Master Connected\n");
+    printf("NVM Master Connected\n");
 }
 
 
@@ -130,7 +144,6 @@ void *Thread_main(void *arg){
 
     createClient(c); //master구조체도 포함
     int count=0;
-	printf("-----\n");
 
     while(1){
         c->size = recv(c->fd, c->client_buf+buf_len, 16*1024, 0);
@@ -146,7 +159,6 @@ void *Thread_main(void *arg){
         failover_flag = send(c->m->fd, c->client_buf+buf_len, c->size, 0);
         if(failover_flag == -1){
             masterFailover(c);
-            printf("----------\n");
 
             buf_len -=c->size;
             failover_flag=send(c->m->fd, c->client_buf+buf_len, c->size, 0);
@@ -156,22 +168,35 @@ void *Thread_main(void *arg){
         buf_len +=c->size;
 
 		c->m->size = recv(c->m->fd, c->m->req_msg+master_buf_len, 16*1024, 0);
-        if(c->m->size == -1){
+        if(c->m->size == -1 && count <=2){
             masterFailover(c);
-            printf("2222222222\n");
 
             buf_len -=c->size;
             failover_flag=send(c->m->fd, c->client_buf+buf_len, c->size, 0);
 
             buf_len += c->size;
             c->m->size = recv(c->m->fd, c->m->req_msg+master_buf_len, 16*1024,0);
+            count++;
+        } 
+
+        if(strcmp(c->m->req_msg+master_buf_len-c->m->size,"+OK\r\n")){
+            if(count>=3){
+                revalMaster(c);
+
+                buf_len -= c->size;
+                failover_flag=send(c->m->fd, c->client_buf+buf_len, c->size, 0);
+
+                buf_len += c->size;
+                c->m->size = recv(c->m->fd, c->m->req_msg+master_buf_len, 16*1024,0);
+                count=0;
+            }
         }
+
 
        // printf("c->m->size %d\n", c->m->size);
 
 		send(c->fd, c->m->req_msg+master_buf_len, c->m->size, 0);
         master_buf_len+=c->m->size;
-        count++;
        // printf("insert data count %d\n", count);
 
     }
